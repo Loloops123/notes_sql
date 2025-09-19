@@ -1,0 +1,22 @@
+{
+  "name": "8",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "6.16.2",
+    "dotenv": "^17.2.2",
+    "express": "4.19.2",
+    "express-async-errors": "^3.1.1",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.2"
+  }
+}
