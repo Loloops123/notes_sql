@@ -1,35 +1,10 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import isEmail from 'validator/lib/isEmail.js'
-import isStrongPassword from 'validator/lib/isStrongPassword.js'
 
 import * as userService from '../services/user.service.js'
 
 export const register = async (req, res) => {
   const { email, password } = req.body
-  
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email и password обязательны' })
-  }
-  
-  if (!isEmail(email)) {
-    return res.status(400).json({ message: 'Невалидный email' })
-  }
-  
-  if (!isStrongPassword(password, {
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: -1
-  })) {
-    return res.status(400).json(
-      {
-        message:
-          'Пароль должен содержать не менее 8 символов с 1 заглавной буквой, 1 цифрой, 1 буквой в нижнем регистре'
-      }
-    )
-  }
   
   try {
     const newUser = await userService.createUser(email, password)
