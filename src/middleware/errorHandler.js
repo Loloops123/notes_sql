@@ -1,9 +1,20 @@
+import logger from '../config/logger.js'
+import ApiError from '../utils/ApiError.js'
+
 export const errorHandler = (err, req, res, next) => {
-  console.error(err.stack)
+  logger.error(err.message, {
+    stack: err.stack
+  })
+  
+  if (err instanceof ApiError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message
+    })
+  }
   
   res.status(500).json({
     success: false,
-    message: 'Произошла внутренняя ошибка сервера.',
-    error: err
+    message: 'Произошла непредвиденная ошибка сервера.'
   })
 }
