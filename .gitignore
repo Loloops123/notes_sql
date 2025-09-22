@@ -4,3 +4,4 @@ postgres-data/
 /src/generated/prisma
 logs/
 .idea/
+coverage/
