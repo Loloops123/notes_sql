@@ -9,7 +9,11 @@ const config = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
-  transform: {}
+  transform: {},
+  testMatch: [
+    '**/tests/unit/**/*.test.js',
+    '**/tests/integration/**/*.test.js'
+  ]
 }
 
 export default config

@@ -1,0 +1,129 @@
+import { afterAll, beforeEach, describe, expect, it } from '@jest/globals'
+import request from 'supertest'
+import app from '../../../src/app.js'
+import prisma from '../../../src/prisma.js'
+import { createUserAndGetToken } from '../../utils/auth.helper.js'
+
+describe('READ', () => {
+  let testUser
+  let authToken
+  let testNote
+  
+  beforeEach(async () => {
+    await prisma.note.deleteMany({})
+    await prisma.user.deleteMany({})
+    
+    const { user, token } = await createUserAndGetToken()
+    
+    testUser = user
+    authToken = token
+    
+    testNote = await prisma.note.create({
+      data: {
+        title: 'Test Note',
+        content: 'This is a test note',
+        userId: testUser.id
+      }
+    })
+  })
+  
+  afterAll(async () => {
+    await prisma.$disconnect()
+  })
+  
+  describe('GET /notes', () => {
+    it('should get all notes', async () => {
+      const response = await request(app)
+        .get('/notes')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+      
+      expect(response.body).toBeInstanceOf(Array)
+      expect(response.body).toHaveLength(1)
+    })
+  })
+  
+  describe('GET /notes/:id', () => {
+    it('should get note by id', async () => {
+      const response = await request(app)
+        .get(`/notes/${testNote.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+      
+      expect(response.body.id).toBe(testNote.id)
+      expect(response.body.title).toBe('Test Note')
+      expect(response.body.content).toBe('This is a test note')
+      expect(response.body.userId).toBe(testUser.id)
+    })
+    
+    it('should return 404 if note is not found', async () => {
+      const response = await request(app)
+        .get('/notes/3')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(404)
+      
+      expect(response.body).toEqual({
+        message: 'Заметка не найдена',
+        success: false
+      })
+    })
+    
+    it('should return 404 if this note is not acceptable of this user', async () => {
+      const anotherUser = await prisma.user
+        .create(
+          {
+            data:
+              {
+                email: 'another@user.com',
+                password: 'password'
+              }
+          }
+        )
+      const anotherUsersNote = await prisma.note
+        .create(
+          {
+            data:
+              {
+                title: 'Чужая заметка',
+                userId: anotherUser.id
+              }
+          }
+        )
+      
+      const response = await request(app)
+        .get(`/notes/${anotherUsersNote.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(404)
+      
+      expect(response.body).toEqual({
+        message: 'Заметка не найдена',
+        success: false
+      })
+    })
+    
+    it('should return 401 if user is not authenticated', async () => {
+      const response = await request(app)
+        .get('/notes/1')
+        .expect(401)
+      
+      expect(response.body).toEqual({
+        message: 'Нет авторизации, токен не предоставлен',
+        success: false
+      })
+    })
+    
+    it('should return 401 if token is invalid', async () => {
+      let invalidToken = 'test_invalid_token'
+      
+      const response = await request(app)
+        .get('/notes/1')
+        .set('Authorization', `Bearer ${invalidToken}`)
+        .expect(401)
+      
+      expect(response.body).toEqual({
+        message: 'Нет авторизации, токен недействителен',
+        success: false
+      })
+    })
+  })
+})
