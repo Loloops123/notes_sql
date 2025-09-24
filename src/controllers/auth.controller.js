@@ -46,7 +46,7 @@ export const login = async (req, res) => {
     { expiresIn: '1h' }
   )
   
-  res.json({
+  res.status(200).json({
     message: 'Вход выполнен успешно',
     token
   })

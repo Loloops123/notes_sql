@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import ApiError from '../utils/ApiError.js'
 
 export const protect = (req, res, next) => {
   let token
@@ -11,7 +12,7 @@ export const protect = (req, res, next) => {
   }
   
   if (!token) {
-    return res.status(401).json({ message: 'Нет авторизации, токен не предоставлен' })
+    throw new ApiError(401, 'Нет авторизации, токен не предоставлен')
   }
   
   try {
@@ -21,6 +22,6 @@ export const protect = (req, res, next) => {
     
     next()
   } catch (err) {
-    return res.status(401).json({ message: 'Нет авторизации, токен недействителен' })
+    throw new ApiError(401, 'Нет авторизации, токен недействителен')
   }
 }

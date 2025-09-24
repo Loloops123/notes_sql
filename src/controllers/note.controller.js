@@ -5,7 +5,7 @@ export const getAllNotes = async (req, res) => {
   const { userId } = req
   const notes = await noteService.getAllNotes(userId)
   
-  res.json(notes)
+  res.status(200).json(notes)
 }
 
 export const getNoteById = async (req, res) => {
@@ -16,7 +16,7 @@ export const getNoteById = async (req, res) => {
     throw new ApiError(404, 'Заметка не найдена')
   }
   
-  res.json(note)
+  res.status(200).json(note)
 }
 
 export const createNote = async (req, res) => {
@@ -43,7 +43,7 @@ export const updateNote = async (req, res) => {
   
   const updatedNote = await noteService.updateNote(id, title, content, userId)
   
-  res.json(updatedNote)
+  res.status(200).json(updatedNote)
 }
 
 export const patchNote = async (req, res) => {
@@ -51,7 +51,7 @@ export const patchNote = async (req, res) => {
   const { id } = req.params
   const updatedNote = await noteService.patchNote(id, req.body, userId)
   
-  res.json(updatedNote)
+  res.status(200).json(updatedNote)
 }
 
 export const deleteNote = async (req, res) => {
