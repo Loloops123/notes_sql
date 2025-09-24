@@ -18,10 +18,38 @@ describe('READ', () => {
     testUser = user
     authToken = token
     
-    testNote = await prisma.note.create({
-      data: {
-        title: 'Test Note',
-        content: 'This is a test note',
+    await prisma.note.createMany({
+      data: [
+        {
+          title: 'Note 1',
+          userId: testUser.id,
+          createdAt: new Date('2025-01-01T10:00:00Z')
+        },
+        {
+          title: 'Note 2',
+          userId: testUser.id,
+          createdAt: new Date('2025-01-01T11:00:00Z')
+        },
+        {
+          title: 'Note 3',
+          userId: testUser.id,
+          createdAt: new Date('2025-01-01T12:00:00Z')
+        },
+        {
+          title: 'Note 4',
+          userId: testUser.id,
+          createdAt: new Date('2025-01-01T13:00:00Z')
+        },
+        {
+          title: 'Note 5',
+          userId: testUser.id,
+          createdAt: new Date('2025-01-01T14:00:00Z')
+        }
+      ]
+    })
+    
+    testNote = await prisma.note.findFirst({
+      where: {
         userId: testUser.id
       }
     })
@@ -38,8 +66,18 @@ describe('READ', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
       
-      expect(response.body).toBeInstanceOf(Array)
-      expect(response.body).toHaveLength(1)
+      expect(response.body).toHaveProperty('data')
+      expect(response.body).toHaveProperty('meta')
+      
+      expect(response.body.data).toHaveLength(5)
+      expect(response.body.data[0].title).toBe('Note 5')
+      
+      const { meta } = response.body
+      
+      expect(meta.totalNotes).toBe(5)
+      expect(meta.totalPages).toBe(1)
+      expect(meta.currentPage).toBe(1)
+      expect(meta.limit).toBe(10)
     })
   })
   
@@ -51,8 +89,7 @@ describe('READ', () => {
         .expect(200)
       
       expect(response.body.id).toBe(testNote.id)
-      expect(response.body.title).toBe('Test Note')
-      expect(response.body.content).toBe('This is a test note')
+      expect(response.body.title).toBe('Note 1')
       expect(response.body.userId).toBe(testUser.id)
     })
     

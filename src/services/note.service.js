@@ -1,9 +1,24 @@
 import prisma from '../prisma.js'
 
-export const getAllNotes = async (userId) => {
-  return prisma.note.findMany({
-    where: { userId }
-  })
+export const getAllNotes = async (userId, options = {}) => {
+  const { skip, take, orderBy } = options
+  
+  const [notes, totalNotes] = await prisma.$transaction([
+    prisma.note.findMany({
+      where: { userId },
+      skip,
+      take,
+      orderBy
+    }),
+    prisma.note.count({
+      where: { userId }
+    })
+  ])
+  
+  return {
+    notes,
+    totalNotes
+  }
 }
 
 export const getNoteById = async (id, userId) => {

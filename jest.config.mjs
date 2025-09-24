@@ -13,7 +13,8 @@ const config = {
   testMatch: [
     '**/tests/unit/**/*.test.js',
     '**/tests/integration/**/*.test.js'
-  ]
+  ],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup/redis.setup.js']
 }
 
 export default config

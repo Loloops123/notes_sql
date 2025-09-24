@@ -21,6 +21,8 @@ model Note {
   createdAt   DateTime @default(now())
   userId      Int
   User        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
 }
 
 model User {
