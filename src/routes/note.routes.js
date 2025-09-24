@@ -1,6 +1,10 @@
 import { Router } from 'express'
-import * as noteController from '../controllers/note.controller.js'
+import redisClient from '../config/redisClient.js'
+import { createNoteController } from '../controllers/note.controller.js'
 import { protect } from '../middleware/auth.middleware.js'
+import * as noteService from '../services/note.service.js'
+
+const noteController = createNoteController(noteService, redisClient)
 
 const router = Router()
 
